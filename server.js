@@ -5,9 +5,10 @@ const bodyParser = require('body-parser')
 const shortId = require('shortid')
 
 
-//Global variables
+//Global variables mostly used for adapting UI with backend changes (-1 => initial set up, 0 => no change, 1 => change on db)
 
 let setStatus = -1
+let url = ''
 
 
 //Basic set up for express server
@@ -46,18 +47,14 @@ client.on('end', () => {
 //Main endpoint
 
 app.get('/', (req, res) => {
-    if(setStatus != -1) {
-        res.render('index', { statusMessage: setStatus })
-        setStatus = -1
-    }else{
-        res.render('index', { statusMessage: setStatus })
-    }
+    res.render('index', { statusMessage: setStatus, urlResponse: url})
+    setStatus = -1
+    url = ''
 })
 
 //PUSH and GET endpoints
 
 app.post('/push-url', async (req, res) => {
-
     await client.connect()
     await client.exists(req.body.fullUrl).then( async (reply) => {
         if(reply == 1) {
@@ -76,8 +73,24 @@ app.post('/push-url', async (req, res) => {
     res.redirect('/')
 })
 
-//Useful functions
+app.post('/get-url', async (req, res) => {
+    await client.connect()
+    await client.exists(req.body.shortUrl).then( async (reply) => {
+        if(reply == 1) {
+            console.log("Short url exist getting long URL")
+            url = await getUrl(req.body.shortUrl)
+        }else{
+            console.log("Short url don't exist")
+            url = 'Error'
+        }
+    }, (err) => {
+        console.log(err)
+    })
+    client.disconnect()
+    res.redirect('/')
+})
 
+//Useful functions
 
 async function setUrl(fullUrl) {
     let shortUrl = shortId.generate()
@@ -100,4 +113,14 @@ async function setEmail(usrEmail) {
     }else{
         await client.set(usrEmail, count)
     }  
+}
+
+async function getUrl(shortUrl) {
+    let tmpUrl = '';
+    await client.get(shortUrl).then( (reply) => {
+        tmpUrl = reply
+    }, (err) => {
+        console.log(err)
+    })
+    return tmpUrl
 }
