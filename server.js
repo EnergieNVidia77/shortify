@@ -29,8 +29,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 //Redis set up
 
 const client = redis.createClient({
-    host: '127.0.0.1',
-    port: 6379
+    url: 'redis://@db:6379'
 })
 
 //Redis events listeners
