@@ -23,21 +23,22 @@
                     <label for="fullUrl" class="form-label">URL</label>
                     <input class="form-control" type="url" name="fullUrl" id="fullUrl" placeholder="Long Url" required>
                 </div>
-                
+
+                <% if(shortUrlResponse != ''){ %>
+                    <div class="alert alert-success w-75" role="alert" style="margin-top: 1.5rem;">
+                        Short URL created <%= shortUrlResponse %>
+                    </div>
+                <% } %>  
+                <% if(statusMessage == 0){ %>
+                    <div class="alert alert-danger w-75" role="alert" style="margin-top: 1.5rem;">
+                        URL already saved !
+                    </div>
+                <% } %>
                 <div style="margin-top: 2rem; display: flex; justify-content: center;">
                     <button class="btn btn-primary" type="submit">Shortify</button>
                 </div>
-        </form>
-        <% if(statusMessage == 1) { %>
-            <div style="margin-top: 0.5rem; display: flex; justify-content: center;">
-                <span class="badge bg-success">Url successfully saved</span>
-            </div>
-            
-        <% }else if(statusMessage == 0){ %>
-            <div style="margin-top: 0.5rem; display: flex; justify-content: center;">
-                <span class="badge bg-danger">Url already saved !</span>
-            </div>
-        <% } %>
+        </form>        
+        
 
         <div class="container" style="margin-top: 2.5rem;">
             <form action="/get-url" method="POST">
@@ -46,11 +47,11 @@
                     <input class="form-control" type="text" name="shortUrl" id="shorUrl" placeholder="Short url" required>
 
                     <% if(urlResponse == 'Error'){ %>
-                        <div class="alert alert-danger" role="alert" style="margin-top: 1.5rem;">
+                        <div class="alert alert-danger w-75" role="alert" style="margin-top: 1.5rem;">
                             URL not found !
                         </div>
                     <% }else if(urlResponse != ''){ %>
-                        <div class="alert alert-success" role="alert" style="margin-top: 1.5rem;">
+                        <div class="alert alert-success w-75" role="alert" style="margin-top: 1.5rem;">
                             URL corresponding to your search: <a href="<%= urlResponse %> "><%= urlResponse %> </a>
                         </div>
                     <% } %>  

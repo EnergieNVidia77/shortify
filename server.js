@@ -9,7 +9,7 @@ const shortId = require('shortid')
 
 let setStatus = -1
 let url = ''
-
+let shortUrlG = ''
 
 //Basic set up for express server
 
@@ -47,9 +47,10 @@ client.on('end', () => {
 //Main endpoint
 
 app.get('/', (req, res) => {
-    res.render('index', { statusMessage: setStatus, urlResponse: url})
+    res.render('index', { statusMessage: setStatus, urlResponse: url, shortUrlResponse: shortUrlG})
     setStatus = -1
     url = ''
+    shortUrlG = ''
 })
 
 //PUSH and GET endpoints
@@ -94,8 +95,10 @@ app.post('/get-url', async (req, res) => {
 
 async function setUrl(fullUrl) {
     let shortUrl = shortId.generate()
+    shortUrlG = shortUrl
     await client.set(fullUrl, shortUrl)
-    await client.set(shortUrl, fullUrl)
+    await client.rPush(shortUrl, fullUrl)
+    await client.rPush(shortUrl, 0)
 }
 
 async function setEmail(usrEmail) {
@@ -116,9 +119,17 @@ async function setEmail(usrEmail) {
 }
 
 async function getUrl(shortUrl) {
-    let tmpUrl = '';
-    await client.get(shortUrl).then( (reply) => {
+    let tmpUrl = ''
+    let requestCount = 0
+    await client.lRange(shortUrl, 0, 0).then( (reply) => {
         tmpUrl = reply
+    }, (err) => {
+        console.log(err)
+    })
+    await client.rPop(shortUrl).then( async (reply) => {
+        reply = parseInt(reply)
+        requestCount = reply + 1
+        await client.rPush(shortUrl, requestCount)
     }, (err) => {
         console.log(err)
     })
