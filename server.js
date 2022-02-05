@@ -5,11 +5,17 @@ const bodyParser = require('body-parser')
 const shortId = require('shortid')
 
 
-//Global variables mostly used for adapting UI with backend changes (-1 => initial set up, 0 => no change, 1 => change on db)
+//Global variables mostly used for adapting UI with backend changes
 
-let setStatus = -1
-let url = ''
-let shortUrlG = ''
+let setStatus = -1                      //setStatus => [-1 => initial set up, 0 => no change, 1 => change on db]
+let url = ''                            //When usr give short url this var is used to the UI the URL corresponding
+let shortUrlG = ''                      //Used when the usr is shorting an URL to display him the resulting short URL created
+
+let emails = []
+let count = []
+let shortUrls = []
+let countShortUrls = []  
+
 
 //Basic set up for express server
 
@@ -28,9 +34,9 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 //Redis set up
 
-const client = redis.createClient({
-    url: 'redis://@db:6379'
-})
+const client = redis.createClient(/*{
+    url: 'redis://@db:6379'                                         //Credential for connecting to the container db with docker 
+}*/)
 
 //Redis events listeners
 
