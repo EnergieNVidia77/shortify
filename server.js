@@ -52,7 +52,7 @@ client.on('end', () => {
 //Main endpoint
 
 app.get('/', (req, res) => {
-    res.render('index', { statusMessage: setStatus, urlResponse: url, shortUrlResponse: shortUrlG})
+    res.render('index', { statusMessage: setStatus, urlResponse: url, shortUrlResponse: shortUrlG, emails: emails, count: count})
     setStatus = -1
     url = ''
     shortUrlG = ''
@@ -70,6 +70,7 @@ app.post('/push-url', async (req, res) => {
             console.log("Url don't exist saving it to Redis")
             await setUrl(req.body.fullUrl)
             await setEmail(req.body.usrEmail)
+            await savingData(req.body.usrEmail)
             setStatus = 1
         }
     }, (err) => {
@@ -139,4 +140,17 @@ async function getUrl(shortUrl) {
         console.log(err)
     })
     return tmpUrl
+}
+
+async function savingData(usrEmail) {
+    if(emails.includes(usrEmail)){
+        await client.get(usrEmail).then( (reply) => {
+            count[emails.indexOf(usrEmail)] = reply
+        }, (err) => {
+            console.log(err)
+        })
+    }else{
+        emails.push(usrEmail)
+        count.push(1)
+    }
 }

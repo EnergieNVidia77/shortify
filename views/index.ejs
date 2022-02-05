@@ -70,12 +70,27 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th scope="col">#</th>
                         <th scope="col">Emails</th>
-                        <th scope="col">URL inserted</th>
+                        <th scope="col">Count</th>
                     </tr>
                 </thead>
                 <tbody>
-
+                    <% if(emails.length == 0 && count.length == 0) { %>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>NA</td>
+                            <td>NA</td>
+                        </tr>
+                    <% }else{
+                        emails.forEach((value, index) => { %>
+                            <tr>
+                                <th scope="row"><%=index+1%></th>
+                                <td><%=value%></td>
+                                <td><%=count[index]%></td>
+                            </tr>
+                        <% }) %>
+                    <% } %> 
                 </tbody>
 
             </table>
