@@ -34,9 +34,9 @@ app.use(bodyParser.urlencoded({extended:true}))
 
 //Redis set up
 
-const client = redis.createClient(/*{
+const client = redis.createClient({
     url: 'redis://@db:6379'                                         //Credential for connecting to the container db with docker 
-}*/)
+})
 
 //Redis events listeners
 
