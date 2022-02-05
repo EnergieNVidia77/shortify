@@ -52,7 +52,7 @@ client.on('end', () => {
 //Main endpoint
 
 app.get('/', (req, res) => {
-    res.render('index', { statusMessage: setStatus, urlResponse: url, shortUrlResponse: shortUrlG, emails: emails, count: count})
+    res.render('index', { statusMessage: setStatus, urlResponse: url, shortUrlResponse: shortUrlG, emails: emails, count: count, shortUrls: shortUrls, countShortUrls: countShortUrls})
     setStatus = -1
     url = ''
     shortUrlG = ''
@@ -70,7 +70,7 @@ app.post('/push-url', async (req, res) => {
             console.log("Url don't exist saving it to Redis")
             await setUrl(req.body.fullUrl)
             await setEmail(req.body.usrEmail)
-            await savingData(req.body.usrEmail)
+            await savingEmail(req.body.usrEmail)
             setStatus = 1
         }
     }, (err) => {
@@ -105,6 +105,7 @@ async function setUrl(fullUrl) {
     await client.set(fullUrl, shortUrl)
     await client.rPush(shortUrl, fullUrl)
     await client.rPush(shortUrl, 0)
+    await savingShortUrl(shortUrl)
 }
 
 async function setEmail(usrEmail) {
@@ -139,10 +140,11 @@ async function getUrl(shortUrl) {
     }, (err) => {
         console.log(err)
     })
+    await savingShortUrl(shortUrl)
     return tmpUrl
 }
 
-async function savingData(usrEmail) {
+async function savingEmail(usrEmail) {
     if(emails.includes(usrEmail)){
         await client.get(usrEmail).then( (reply) => {
             count[emails.indexOf(usrEmail)] = reply
@@ -152,5 +154,18 @@ async function savingData(usrEmail) {
     }else{
         emails.push(usrEmail)
         count.push(1)
+    }
+}
+
+async function savingShortUrl(shortUrl) {
+    if(shortUrls.includes(shortUrl)) {
+        await client.lRange(shortUrl, 1, 1).then( (reply) => {
+            countShortUrls[shortUrls.indexOf(shortUrl)] = reply
+        }, (err) => {
+            console.log(err)
+        })
+    }else{
+        shortUrls.push(shortUrl)
+        countShortUrls.push(0)
     }
 }

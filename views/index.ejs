@@ -12,6 +12,7 @@
 </head>
 <body>
     <h1 style="display: flex; justify-content: center; margin-top: 5rem;">Shortify</h1>
+
     <div class="container" style="margin-top: 5rem; font-family: 'Poppins', sans-serif; display: flex; flex-direction: row;">
 
         <div class="container">
@@ -96,7 +97,35 @@
             </table>
 
         </div>
+    </div>
 
+    <div class="container" style="margin-top: 1.5rem;">
+        <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Short URL</th>
+                        <th scope="col">Request made</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if(countShortUrls.length == 0 && shortUrls.length == 0) { %>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>NA</td>
+                            <td>NA</td>
+                        </tr>
+                    <% }else{
+                        shortUrls.forEach((value, index) => { %>
+                            <tr>
+                                <th scope="row"><%=index+1%></th>
+                                <td><%=value%></td>
+                                <td><%=countShortUrls[index]%></td>
+                            </tr>
+                        <% }) %>
+                    <% } %> 
+                </tbody>
+        </table>
     </div>
     
 </body>
